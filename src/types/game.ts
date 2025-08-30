@@ -11,6 +11,7 @@ export interface Mob {
 
 export interface GameState {
   playerPosition: Position;
+  playerFacing: Direction;
   mob: Mob;
   target: Position;
   gridSize: number;

@@ -10,6 +10,7 @@ export default function App() {
       x: 0,
       y: 0,
     },
+    playerFacing: 'north',
     mob: {
       id: 1,
       position: {

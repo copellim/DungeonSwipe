@@ -65,6 +65,7 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
   const resetGame = () => {
     setGameState({
       playerPosition: { x: 0, y: 0 },
+      playerFacing: 'north',
       mob: {
         id: 1,
         position: { x: 3, y: 3 },
@@ -137,6 +138,7 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
           <Text style={styles.position}>
             Player position: ({gameState.playerPosition.x}, {gameState.playerPosition.y})
           </Text>
+          <Text style={styles.position}>Player facing: {gameState.playerFacing}</Text>
           <Text style={styles.position}>
             Mob position: ({gameState.mob.position.x}, {gameState.mob.position.y})
           </Text>
