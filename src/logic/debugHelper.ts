@@ -28,3 +28,12 @@ export function debugPrintDungeon(
   }
   console.log('===================\n');
 }
+
+export function debugPrintRoomInfo(roomInfo: any): void {
+  console.debug('\n=== ROOM INFO ===');
+  console.debug('Has Exit:', roomInfo.hasExit);
+  console.debug('Has Mob:', roomInfo.hasMob);
+  console.debug('Has Target:', roomInfo.hasTarget);
+  console.debug('Mob Direction:', roomInfo.mobDirection);
+  console.debug('===================\n');
+}

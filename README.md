@@ -36,8 +36,8 @@ A puzzle-adventure game where players navigate dungeons in first-person view, us
 
 ### Phase 1: First Person View
 
-- [ ] Room-based rendering instead of grid view
-- [ ] Atmospheric backgrounds for each room
+- [x] Room-based rendering instead of grid view
+- [x] Atmospheric backgrounds for each room
 - [ ] Navigation indicators (doors/passages)
 - [ ] Audio feedback system
 - [ ] Smooth transitions between rooms
@@ -55,6 +55,7 @@ A puzzle-adventure game where players navigate dungeons in first-person view, us
 - [ ] Performance optimizations
 - [ ] Enhanced state management (Context API)
 - [ ] Sound effects and music
+- [ ] Enhanced backgrounds
 - [ ] App store preparation
 
 ## Learning Goals

@@ -40,7 +40,6 @@ describe('moveInDirectionWithBounce', () => {
 
   it('does not move if blocked in both directions', () => {
     const start: Position = { x: 0, y: 0 };
-    // Try to move south (blocked), bounce to north (possible)
     const result = moveInDirectionWithBounce('south', start, gridSize);
     expect(result.position).toEqual({ x: 0, y: 1 });
     expect(result.direction).toBe('north');
