@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { GameState } from '../types/game';
+import { Direction, GameState, Mob, Position } from '../types/game';
 import { Gesture, GestureDetector, GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
+import { canMoveInDirection, moveInDirection, moveInDirectionWithBounce } from '../logic/gameLogic';
 
 interface GameScreenProps {
   gameState: GameState;
@@ -9,108 +10,56 @@ interface GameScreenProps {
 }
 
 export default function GameScreen({ gameState, setGameState }: GameScreenProps) {
-  const movePlayer = (direction: 'north' | 'south' | 'east' | 'west') => {
+  const executeTurn = (playerDirection: 'north' | 'south' | 'east' | 'west') => {
     setGameState((currentState: GameState) => {
-      const newPosition = { ...currentState.playerPosition };
-      switch (direction) {
-        case 'north':
-          newPosition.y = Math.max(0, newPosition.y - 1);
-          break;
-        case 'south':
-          newPosition.y = Math.min(currentState.gridSize - 1, newPosition.y + 1);
-          break;
-        case 'east':
-          newPosition.x = Math.min(currentState.gridSize - 1, newPosition.x + 1);
-          break;
-        case 'west':
-          newPosition.x = Math.max(0, newPosition.x - 1);
-          break;
-      }
+      const newPlayerPosition = movePlayer(currentState.playerPosition, playerDirection);
+      const newMobPosition = moveMob(currentState.mob, currentState.gridSize);
 
-      const stateWithPlayerMoved = {
-        ...currentState,
-        playerPosition: newPosition,
-      };
-
-      const finalState = moveMob(stateWithPlayerMoved);
-
-      if (checkWin(finalState)) {
+      if (checkWin(newPlayerPosition, currentState.target)) {
         return {
-          ...finalState,
+          ...currentState,
           gameStatus: 'won',
         };
       }
 
-      if (checkCollision(finalState)) {
+      if (checkCollision(newPlayerPosition, newMobPosition)) {
         return {
-          ...finalState,
+          ...currentState,
           gameStatus: 'gameOver',
         };
       }
 
-      return finalState;
+      return {
+        ...currentState,
+        playerPosition: newPlayerPosition,
+        mob: newMobPosition,
+      };
     });
   };
 
-  const moveMob = (currentGameState: GameState): GameState => {
-    const mob = currentGameState.mob;
-    let newPosition = { ...mob.position };
-    let newDirection = mob.direction;
-
-    // Calcola dove il mob VORREBBE andare
-    switch (mob.direction) {
-      case 'north':
-        if (newPosition.y > 0) {
-          newPosition.y = newPosition.y - 1;
-        } else {
-          // Colpisce il muro nord, rimbalza a sud
-          newDirection = 'south';
-        }
-        break;
-      case 'south':
-        if (newPosition.y < currentGameState.gridSize - 1) {
-          newPosition.y = newPosition.y + 1;
-        } else {
-          // Colpisce il muro sud, rimbalza a nord
-          newDirection = 'north';
-        }
-        break;
-      case 'west':
-        if (newPosition.x > 0) {
-          newPosition.x = newPosition.x - 1;
-        } else {
-          // Colpisce il muro ovest, rimbalza a est
-          newDirection = 'east';
-        }
-        break;
-      case 'east':
-        if (newPosition.x < currentGameState.gridSize - 1) {
-          newPosition.x = newPosition.x + 1;
-        } else {
-          // Colpisce il muro est, rimbalza a ovest
-          newDirection = 'west';
-        }
-        break;
+  const movePlayer = (position: Position, direction: Direction): Position => {
+    if (canMoveInDirection(direction, position, gameState.gridSize)) {
+      return moveInDirection(direction, position);
     }
+    return position;
+  };
+
+  const moveMob = (mob: Mob, gridSize: number): Mob => {
+    const result = moveInDirectionWithBounce(mob.direction, mob.position, gridSize);
 
     return {
-      ...currentGameState,
-      mob: {
-        ...mob,
-        position: newPosition,
-        direction: newDirection,
-      },
+      ...mob,
+      position: result.position,
+      direction: result.direction,
     };
   };
 
-  const checkCollision = (gameState: GameState): boolean => {
-    return (
-      gameState.playerPosition.x === gameState.mob.position.x && gameState.playerPosition.y === gameState.mob.position.y
-    );
+  const checkCollision = (playerPosition: Position, mob: Mob): boolean => {
+    return playerPosition.x === mob.position.x && playerPosition.y === mob.position.y;
   };
 
-  const checkWin = (gameState: GameState): boolean => {
-    return gameState.playerPosition.x === gameState.target.x && gameState.playerPosition.y === gameState.target.y;
+  const checkWin = (playerPosition: Position, targetPosition: Position): boolean => {
+    return playerPosition.x === targetPosition.x && playerPosition.y === targetPosition.y;
   };
 
   const resetGame = () => {
@@ -134,15 +83,15 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
 
     if (Math.abs(translationX) > Math.abs(translationY)) {
       if (translationX > 50) {
-        movePlayer('east');
+        executeTurn('east');
       } else if (translationX < -50) {
-        movePlayer('west');
+        executeTurn('west');
       }
     } else {
       if (translationY > 50) {
-        movePlayer('south');
+        executeTurn('south');
       } else if (translationY < -50) {
-        movePlayer('north');
+        executeTurn('north');
       }
     }
   });

@@ -16,3 +16,5 @@ export interface GameState {
   gridSize: number;
   gameStatus: 'playing' | 'gameOver' | 'won';
 }
+
+export type Direction = 'north' | 'south' | 'east' | 'west';
