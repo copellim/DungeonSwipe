@@ -77,6 +77,15 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
     });
   };
 
+  function rotatePlayerDirection(toRight: boolean): Direction {
+    const directions: Direction[] = ['north', 'west', 'south', 'east'];
+    const currentIndex = directions.indexOf(gameState.playerFacing);
+    const newIndex = toRight
+      ? (currentIndex + 1) % directions.length
+      : (currentIndex - 1 + directions.length) % directions.length;
+    return directions[newIndex];
+  }
+
   const panGesture = Gesture.Pan().onEnd((event) => {
     if (gameState.gameStatus !== 'playing') return;
 
@@ -84,15 +93,19 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
 
     if (Math.abs(translationX) > Math.abs(translationY)) {
       if (translationX > 50) {
-        executeTurn('east');
+        setGameState((currentState) => ({
+          ...currentState,
+          playerFacing: rotatePlayerDirection(true),
+        }));
       } else if (translationX < -50) {
-        executeTurn('west');
+        setGameState((currentState) => ({
+          ...currentState,
+          playerFacing: rotatePlayerDirection(false),
+        }));
       }
     } else {
       if (translationY > 50) {
-        executeTurn('south');
-      } else if (translationY < -50) {
-        executeTurn('north');
+        executeTurn(gameState.playerFacing);
       }
     }
   });
