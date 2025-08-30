@@ -19,3 +19,10 @@ export interface GameState {
 }
 
 export type Direction = 'north' | 'south' | 'east' | 'west';
+
+export interface AdjacentRoomInfo {
+  hasExit: boolean;
+  hasMob: boolean;
+  mobDirection?: Direction;
+  hasTarget: boolean;
+}

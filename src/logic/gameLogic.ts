@@ -1,4 +1,4 @@
-import { Direction, Position } from '../types/game';
+import { AdjacentRoomInfo, Direction, Position } from '../types/game';
 
 export function canMoveInDirection(direction: Direction, actorPosition: Position, gridSize: number): boolean {
   switch (direction) {
@@ -65,4 +65,25 @@ export function rotatePlayerDirection(playerFacing: Direction, clockWise: boolea
     ? (currentIndex + 1) % directions.length
     : (currentIndex - 1 + directions.length) % directions.length;
   return directions[newIndex];
+}
+
+export function getAdjacentRoomInfo(
+  playerPosition: Position,
+  facingDirection: Direction,
+  gridSize: number,
+  mobPosition: Position,
+  mobDirection: Direction,
+  targetPosition: Position
+): AdjacentRoomInfo {
+  const adjacentPosition = moveInDirection(facingDirection, playerPosition);
+  const hasExit = canMoveInDirection(facingDirection, playerPosition, gridSize);
+  const hasMob = hasExit && adjacentPosition.x === mobPosition.x && adjacentPosition.y === mobPosition.y;
+  const hasTarget = hasExit && adjacentPosition.x === targetPosition.x && adjacentPosition.y === targetPosition.y;
+
+  return {
+    hasExit,
+    hasMob,
+    mobDirection: hasMob ? mobDirection : undefined,
+    hasTarget,
+  };
 }

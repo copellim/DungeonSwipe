@@ -8,6 +8,8 @@ import {
   moveInDirectionWithBounce,
   rotatePlayerDirection,
 } from '../logic/gameLogic';
+import RoomRenderer from './RoomRenderer';
+import { debugPrintDungeon } from '../logic/debugHelper';
 
 interface GameScreenProps {
   gameState: GameState;
@@ -19,6 +21,8 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
     setGameState((currentState: GameState) => {
       const newPlayerPosition = movePlayer(currentState.playerPosition, playerDirection);
       const newMobPosition = moveMob(currentState.mob, currentState.gridSize);
+
+      debugPrintDungeon(currentState.gridSize, newPlayerPosition, newMobPosition.position, currentState.target);
 
       if (checkWin(newPlayerPosition, currentState.target)) {
         return {
@@ -141,19 +145,7 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
     <GestureHandlerRootView style={styles.container}>
       <GestureDetector gesture={panGesture}>
         <View style={styles.gameArea}>
-          <Text style={styles.title}>Dungeon Game</Text>
-          <Text style={styles.instruction}>Swipe to move</Text>
-          <Text style={styles.position}>
-            Player position: ({gameState.playerPosition.x}, {gameState.playerPosition.y})
-          </Text>
-          <Text style={styles.position}>Player facing: {gameState.playerFacing}</Text>
-          <Text style={styles.position}>
-            Mob position: ({gameState.mob.position.x}, {gameState.mob.position.y})
-          </Text>
-          <Text style={styles.position}>Mob direction: {gameState.mob.direction}</Text>
-          <Text style={styles.position}>
-            Target position: ({gameState.target.x}, {gameState.target.y})
-          </Text>
+          <RoomRenderer gameState={gameState} />
         </View>
       </GestureDetector>
     </GestureHandlerRootView>
