@@ -2,7 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Direction, GameState, Mob, Position } from '../types/game';
 import { Gesture, GestureDetector, GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
-import { canMoveInDirection, moveInDirection, moveInDirectionWithBounce } from '../logic/gameLogic';
+import {
+  canMoveInDirection,
+  moveInDirection,
+  moveInDirectionWithBounce,
+  rotatePlayerDirection,
+} from '../logic/gameLogic';
 
 interface GameScreenProps {
   gameState: GameState;
@@ -77,34 +82,24 @@ export default function GameScreen({ gameState, setGameState }: GameScreenProps)
     });
   };
 
-  function rotatePlayerDirection(toRight: boolean): Direction {
-    const directions: Direction[] = ['north', 'west', 'south', 'east'];
-    const currentIndex = directions.indexOf(gameState.playerFacing);
-    const newIndex = toRight
-      ? (currentIndex + 1) % directions.length
-      : (currentIndex - 1 + directions.length) % directions.length;
-    return directions[newIndex];
-  }
-
   const panGesture = Gesture.Pan().onEnd((event) => {
     if (gameState.gameStatus !== 'playing') return;
 
     const { translationX, translationY } = event;
+    const absoluteThreshold = 50;
+
+    const maxTranslation = Math.max(Math.abs(translationX), Math.abs(translationY));
+    if (maxTranslation < absoluteThreshold) return;
 
     if (Math.abs(translationX) > Math.abs(translationY)) {
-      if (translationX > 50) {
-        setGameState((currentState) => ({
-          ...currentState,
-          playerFacing: rotatePlayerDirection(true),
-        }));
-      } else if (translationX < -50) {
-        setGameState((currentState) => ({
-          ...currentState,
-          playerFacing: rotatePlayerDirection(false),
-        }));
-      }
+      const turnClockwise = translationX > absoluteThreshold;
+      setGameState((currentState) => ({
+        ...currentState,
+        playerFacing: rotatePlayerDirection(currentState.playerFacing, turnClockwise),
+      }));
     } else {
-      if (translationY > 50) {
+      const moveForward = translationY < -absoluteThreshold;
+      if (moveForward) {
         executeTurn(gameState.playerFacing);
       }
     }

@@ -57,3 +57,12 @@ export function bounceDirection(direction: Direction): Direction {
       return 'east';
   }
 }
+
+export function rotatePlayerDirection(playerFacing: Direction, clockWise: boolean): Direction {
+  const directions: Direction[] = ['north', 'east', 'south', 'west'];
+  const currentIndex = directions.indexOf(playerFacing);
+  const newIndex = clockWise
+    ? (currentIndex + 1) % directions.length
+    : (currentIndex - 1 + directions.length) % directions.length;
+  return directions[newIndex];
+}
